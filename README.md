@@ -6,3 +6,5 @@ Consta de la clase ZCL_CA_HTTP_SERVICES y se puede ver su funcionamiento en el p
 # Prerequisitos / Prerequisites
 
 Versión ABAP 7.4 o superior / ABAP 7.4 or higher
+
+Tener instalada la clase ZCL_CA_UTILITIES que esta aquí: (https://github.com/irodrigob/utilities) / Have the ZCL_CA_UTILITIES class installed here: (https://github.com/irodrigob/utilities)
