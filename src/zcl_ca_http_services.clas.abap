@@ -23,8 +23,9 @@ CLASS zcl_ca_http_services DEFINITION
         !iv_token TYPE string .
     METHODS create_http_client
       IMPORTING
-        !iv_client   TYPE string
-        !iv_is_https TYPE abap_bool .
+                !iv_client   TYPE string
+                !iv_is_https TYPE abap_bool
+      RAISING   zcx_ca_http_services.
     METHODS set_request_method
       IMPORTING
         !iv_method TYPE any .
@@ -38,9 +39,10 @@ CLASS zcl_ca_http_services DEFINITION
         !iv_convert_data_2_json TYPE sap_bool DEFAULT abap_false .
     METHODS send
       IMPORTING
-        !iv_data                TYPE data OPTIONAL
-        !iv_pretty_name         TYPE /ui2/cl_json=>pretty_name_mode OPTIONAL
-        !iv_convert_data_2_json TYPE sap_bool DEFAULT abap_false .
+                !iv_data                TYPE data OPTIONAL
+                !iv_pretty_name         TYPE /ui2/cl_json=>pretty_name_mode OPTIONAL
+                !iv_convert_data_2_json TYPE sap_bool DEFAULT abap_false
+      RAISING   zcx_ca_http_services.
     METHODS receive
       IMPORTING
         !iv_pretty_name TYPE /ui2/cl_json=>pretty_name_mode OPTIONAL
@@ -84,8 +86,10 @@ CLASS zcl_ca_http_services IMPLEMENTATION.
         OTHERS             = 4.
 
     IF sy-subrc NE 0.
-      DATA(lo_error) = zcx_ca_reuse_error=>gen_syst(  ).
-      RAISE EXCEPTION lo_error.
+
+      RAISE EXCEPTION TYPE zcx_ca_http_services
+        EXPORTING
+          textid = zcx_ca_http_services=>error_instance_http_class.
     ENDIF.
 
   ENDMETHOD.
@@ -103,13 +107,13 @@ CLASS zcl_ca_http_services IMPLEMENTATION.
         OTHERS                     = 4 ).
 
     IF sy-subrc NE 0. " Si hay error no lanzo a excepción salvo que no se puede recuperar bien el status_code.
-      DATA(ls_return) = zcl_ca_utilidades=>fill_return( i_type       = sy-msgty
-                                                        i_id         = sy-msgid
-                                                        i_number     = sy-msgno
-                                                        i_message_v1 = sy-msgv1
-                                                        i_message_v2 = sy-msgv2
-                                                        i_message_v3 = sy-msgv3
-                                                        i_message_v4 = sy-msgv4 ).
+      DATA(ls_return) = zcl_ca_utilities=>fill_return( iv_type       = sy-msgty
+                                                       iv_id         = sy-msgid
+                                                       iv_number     = sy-msgno
+                                                       iv_message_v1 = sy-msgv1
+                                                       iv_message_v2 = sy-msgv2
+                                                       iv_message_v3 = sy-msgv3
+                                                       iv_message_v4 = sy-msgv4 ).
     ENDIF.
 
 * Obtengo el resultado de la petición. Si todo va bien el codigo ha de ser 200.
@@ -170,8 +174,9 @@ CLASS zcl_ca_http_services IMPLEMENTATION.
         http_invalid_timeout       = 4
         OTHERS                     = 5 ).
     IF sy-subrc <> 0.
-      DATA(lo_error) = zcx_ca_reuse_error=>gen_syst(  ).
-      RAISE EXCEPTION lo_error.
+      RAISE EXCEPTION TYPE zcx_ca_http_services
+        EXPORTING
+          textid = zcx_ca_http_services=>error_send_data.
     ENDIF.
 
   ENDMETHOD.

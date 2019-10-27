@@ -4,8 +4,8 @@
   <asx:values>
    <VSEOCLASS>
     <CLSNAME>ZCL_CA_HTTP_SERVICES</CLSNAME>
-    <LANGU>S</LANGU>
-    <DESCRIPT>CA - Clase para llamada a servicios HTTP</DESCRIPT>
+    <LANGU>E</LANGU>
+    <DESCRIPT>CA - Class for calling HTTP services</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>
