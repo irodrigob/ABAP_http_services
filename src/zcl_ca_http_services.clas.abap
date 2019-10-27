@@ -23,8 +23,12 @@ CLASS zcl_ca_http_services DEFINITION
         !iv_token TYPE string .
     METHODS create_http_client
       IMPORTING
-                !iv_client   TYPE string
+                !iv_host     TYPE string
                 !iv_is_https TYPE abap_bool
+      RAISING   zcx_ca_http_services.
+    METHODS create_http_client_by_url
+      IMPORTING
+                !iv_url TYPE string
       RAISING   zcx_ca_http_services.
     METHODS set_request_method
       IMPORTING
@@ -75,7 +79,7 @@ CLASS zcl_ca_http_services IMPLEMENTATION.
 
     CALL METHOD cl_http_client=>create
       EXPORTING
-        host               = iv_client
+        host               = iv_host
         scheme             = lv_scheme
       IMPORTING
         client             = mo_http_client
@@ -288,4 +292,26 @@ CLASS zcl_ca_http_services IMPLEMENTATION.
     set_header_value( EXPORTING iv_name = 'Authorization' iv_value = iv_token ). "|{ ms_token-token_type CASE = LOWER } { ms_token-access_token }| ).
 
   ENDMETHOD.
+  METHOD create_http_client_by_url.
+
+
+    CALL METHOD cl_http_client=>create_by_url
+      EXPORTING
+        url                = iv_url
+      IMPORTING
+        client             = mo_http_client
+      EXCEPTIONS
+        argument_not_found = 1
+        plugin_not_active  = 2
+        internal_error     = 3
+        OTHERS             = 4.
+
+    IF sy-subrc NE 0.
+
+      RAISE EXCEPTION TYPE zcx_ca_http_services
+        EXPORTING
+          textid = zcx_ca_http_services=>error_instance_http_class.
+    ENDIF.
+  ENDMETHOD.
+
 ENDCLASS.

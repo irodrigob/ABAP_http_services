@@ -1,0 +1,36 @@
+class ZCX_CA_REST_HTTP_SERVICES definition
+  public
+  inheriting from ZCX_CA_HTTP_SERVICES
+  create public .
+
+public section.
+
+  methods CONSTRUCTOR
+    importing
+      !TEXTID like TEXTID optional
+      !PREVIOUS like PREVIOUS optional
+      !MV_STATUS_CODE type STRING optional
+      !MV_STATUS_TEXT type STRING optional
+      !MV_CONTENT_RESPONSE type STRING optional
+      !MS_RETURN_RESPONSE type BAPIRET2 optional .
+protected section.
+private section.
+ENDCLASS.
+
+
+
+CLASS ZCX_CA_REST_HTTP_SERVICES IMPLEMENTATION.
+
+
+  method CONSTRUCTOR.
+CALL METHOD SUPER->CONSTRUCTOR
+EXPORTING
+TEXTID = TEXTID
+PREVIOUS = PREVIOUS
+MV_STATUS_CODE = MV_STATUS_CODE
+MV_STATUS_TEXT = MV_STATUS_TEXT
+MV_CONTENT_RESPONSE = MV_CONTENT_RESPONSE
+MS_RETURN_RESPONSE = MS_RETURN_RESPONSE
+.
+  endmethod.
+ENDCLASS.
