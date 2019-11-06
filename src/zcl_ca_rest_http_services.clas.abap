@@ -78,27 +78,33 @@ CLASS zcl_ca_rest_http_services IMPLEMENTATION.
 
   METHOD send_request.
 
-    " Se crea la entidad para poder enviar los datos
-    DATA(lo_request) = mo_rest_client->if_rest_client~create_request_entity( ).
+    TRY.
+        " Se crea la entidad para poder enviar los datos
+        DATA(lo_request) = mo_rest_client->if_rest_client~create_request_entity( ).
 
-    lo_request->set_content_type( is_request-request_type ).
+        lo_request->set_content_type( is_request-request_type ).
 
-    " Se llama al método encargado de alimentar la entidad según el tipo de llamada
-    CASE is_request-request_type.
-      WHEN if_rest_media_type=>gc_appl_json.
-        request_json( EXPORTING is_values = is_request-post
-                      CHANGING co_request = lo_request ).
+        " Se llama al método encargado de alimentar la entidad según el tipo de llamada
+        CASE is_request-request_type.
+          WHEN if_rest_media_type=>gc_appl_json.
+            request_json( EXPORTING is_values = is_request-post
+                          CHANGING co_request = lo_request ).
 
-      WHEN if_rest_media_type=>gc_multipart_form_data.
-        request_multipart( EXPORTING is_values = is_request-multipart
-                              CHANGING co_request = lo_request ).
-    ENDCASE.
+          WHEN if_rest_media_type=>gc_multipart_form_data.
+            request_multipart( EXPORTING is_values = is_request-multipart
+                                  CHANGING co_request = lo_request ).
+        ENDCASE.
 
-    " Según el tipo de envio la entidad se llamará como el método HTTP apropiado
-    CASE is_request-request_type.
-      WHEN if_rest_media_type=>gc_appl_json OR if_rest_media_type=>gc_multipart_form_data.
-        mo_rest_client->if_rest_resource~post( lo_request ).
-    ENDCASE.
+        " Según el tipo de envio la entidad se llamará como el método HTTP apropiado
+        CASE is_request-request_type.
+          WHEN if_rest_media_type=>gc_appl_json OR if_rest_media_type=>gc_multipart_form_data.
+            mo_rest_client->if_rest_resource~post( lo_request ).
+        ENDCASE.
+      CATCH cx_rest_client_exception INTO DATA(lo_excep).
+        RAISE EXCEPTION TYPE zcx_ca_rest_http_services
+          EXPORTING
+            textid = zcx_ca_rest_http_services=>error_send_data.
+    ENDTRY.
   ENDMETHOD.
 
 
@@ -124,21 +130,22 @@ CLASS zcl_ca_rest_http_services IMPLEMENTATION.
     DATA(lo_response) = mo_rest_client->if_rest_client~get_response_entity( ).
 
     DATA(lv_status_code) = lo_response->get_header_field( '~status_code' ).
-    DATA(lv__status_text) = lo_response->get_header_field( '~status_reason' ).
+    DATA(lv_status_text) = lo_response->get_header_field( '~status_reason' ).
     es_response-content_length = lo_response->get_header_field( 'content-length' ).
     es_response-content_type = lo_response->get_header_field( 'content-type' ).
-    es_response-response = lo_response->get_string_data( ).
     "     location = lo_response->get_header_field( 'location' ).
     " Si el status de la llamada no es ni 200 ni 201 se lanza excepción porque se ha producido un error en la recepción
     IF lv_status_code NE '200' AND lv_status_code NE '201'.
       RAISE EXCEPTION TYPE zcx_ca_rest_http_services
         EXPORTING
           textid              = zcx_ca_http_services=>receive_error
-          mv_status_code      = CONV #( lv_status_code )
-          mv_status_text      = lv__status_text
-          mv_content_response = es_response-response.
+          mv_status_code      = lv_status_code
+          mv_status_text      = lv_status_text
+          mv_content_response = lo_response->get_string_data( ).
     ENDIF.
+    es_response-response = lo_response->get_string_data( ).
   ENDMETHOD.
+
 
   METHOD create_rest_client_by_url.
     " Primero se crea el client HTTP
