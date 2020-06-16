@@ -4,7 +4,7 @@
   <asx:values>
    <VSEOCLASS>
     <CLSNAME>ZCX_CA_REST_HTTP_SERVICES</CLSNAME>
-    <LANGU>E</LANGU>
+    <LANGU>S</LANGU>
     <DESCRIPT>CA - Exceptions for REST HTTP Services</DESCRIPT>
     <CATEGORY>40</CATEGORY>
     <STATE>1</STATE>

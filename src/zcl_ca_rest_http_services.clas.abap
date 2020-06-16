@@ -63,7 +63,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_ca_rest_http_services IMPLEMENTATION.
+CLASS ZCL_CA_REST_HTTP_SERVICES IMPLEMENTATION.
 
 
   METHOD create_rest_client.
@@ -75,6 +75,56 @@ CLASS zcl_ca_rest_http_services IMPLEMENTATION.
     mo_rest_client = NEW cl_rest_http_client( mo_http_client ).
 
   ENDMETHOD.
+
+
+  METHOD create_rest_client_by_url.
+    " Primero se crea el client HTTP
+    create_http_client_by_url( EXPORTING iv_url = iv_url ).
+
+    " Se crea el client REST pasandole la clase HTTP
+    mo_rest_client = NEW cl_rest_http_client( mo_http_client ).
+  ENDMETHOD.
+
+
+  METHOD get_response.
+    CLEAR: es_response.
+    " Se recupera la respuesta de la entidad
+    DATA(lo_response) = mo_rest_client->if_rest_client~get_response_entity( ).
+
+    DATA(lv_status_code) = lo_response->get_header_field( '~status_code' ).
+    DATA(lv_status_text) = lo_response->get_header_field( '~status_reason' ).
+    es_response-content_length = lo_response->get_header_field( 'content-length' ).
+    es_response-content_type = lo_response->get_header_field( 'content-type' ).
+    "     location = lo_response->get_header_field( 'location' ).
+    " Si el status de la llamada no es ni 200 ni 201 se lanza excepción porque se ha producido un error en la recepción
+    IF lv_status_code NE '200' AND lv_status_code NE '201'.
+      RAISE EXCEPTION TYPE zcx_ca_rest_http_services
+        EXPORTING
+          textid              = zcx_ca_http_services=>receive_error
+          mv_status_code      = lv_status_code
+          mv_status_text      = lv_status_text
+          mv_content_response = lo_response->get_string_data( ).
+    ENDIF.
+    es_response-response = lo_response->get_string_data( ).
+  ENDMETHOD.
+
+
+  METHOD request_json.
+    co_request->set_string_data( is_values-body ).
+  ENDMETHOD.
+
+
+  METHOD request_multipart.
+    DATA(lo_post_file) = NEW cl_rest_multipart_form_data( co_request ).
+
+    lo_post_file->set_file( iv_name = is_values-name
+                            iv_filename = is_values-filename
+                            iv_type = is_values-mimetype
+                            iv_data = is_values-content_file ).
+
+    lo_post_file->if_rest_entity_provider~write_to( co_request ).
+  ENDMETHOD.
+
 
   METHOD send_request.
 
@@ -106,53 +156,4 @@ CLASS zcl_ca_rest_http_services IMPLEMENTATION.
             textid = zcx_ca_rest_http_services=>error_send_data.
     ENDTRY.
   ENDMETHOD.
-
-
-  METHOD request_json.
-    co_request->set_string_data( is_values-body ).
-  ENDMETHOD.
-
-
-  METHOD request_multipart.
-    DATA(lo_post_file) = NEW cl_rest_multipart_form_data( co_request ).
-
-    lo_post_file->set_file( iv_name = is_values-name
-                            iv_filename = is_values-filename
-                            iv_type = is_values-mimetype
-                            iv_data = is_values-content_file ).
-
-    lo_post_file->if_rest_entity_provider~write_to( co_request ).
-  ENDMETHOD.
-
-  METHOD get_response.
-    CLEAR: es_response.
-    " Se recupera la respuesta de la entidad
-    DATA(lo_response) = mo_rest_client->if_rest_client~get_response_entity( ).
-
-    DATA(lv_status_code) = lo_response->get_header_field( '~status_code' ).
-    DATA(lv_status_text) = lo_response->get_header_field( '~status_reason' ).
-    es_response-content_length = lo_response->get_header_field( 'content-length' ).
-    es_response-content_type = lo_response->get_header_field( 'content-type' ).
-    "     location = lo_response->get_header_field( 'location' ).
-    " Si el status de la llamada no es ni 200 ni 201 se lanza excepción porque se ha producido un error en la recepción
-    IF lv_status_code NE '200' AND lv_status_code NE '201'.
-      RAISE EXCEPTION TYPE zcx_ca_rest_http_services
-        EXPORTING
-          textid              = zcx_ca_http_services=>receive_error
-          mv_status_code      = lv_status_code
-          mv_status_text      = lv_status_text
-          mv_content_response = lo_response->get_string_data( ).
-    ENDIF.
-    es_response-response = lo_response->get_string_data( ).
-  ENDMETHOD.
-
-
-  METHOD create_rest_client_by_url.
-    " Primero se crea el client HTTP
-    create_http_client_by_url( EXPORTING iv_url = iv_url ).
-
-    " Se crea el client REST pasandole la clase HTTP
-    mo_rest_client = NEW cl_rest_http_client( mo_http_client ).
-  ENDMETHOD.
-
 ENDCLASS.

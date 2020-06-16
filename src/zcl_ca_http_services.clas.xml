@@ -4,7 +4,7 @@
   <asx:values>
    <VSEOCLASS>
     <CLSNAME>ZCL_CA_HTTP_SERVICES</CLSNAME>
-    <LANGU>E</LANGU>
+    <LANGU>S</LANGU>
     <DESCRIPT>CA - Class for calling HTTP services</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
