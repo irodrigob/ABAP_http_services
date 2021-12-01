@@ -3,7 +3,7 @@ Clase que facilita la llamada de servicios a través del protocolo HTTP / Class 
 
 Consta de las clases / It consists of the: 
 
-* ZCL_CA_HTTP_SERVICES -> se puede ver su funcionamiento en el proyecto de "http_sharepoint"(https://github.com/irodrigob/ABAP_http_sharepoint). / its operation can be seen in the "http_sharepoint"(https://github.com/irodrigob/ABAP_http_sharepoint) project.
+* ZCL_CA_HTTP_SERVICES -> se puede ver su funcionamiento en el proyecto de "http_sharepoint"(https://github.com/irodrigob/ABAP_Sharepoint). / its operation can be seen in the "http_sharepoint"(https://github.com/irodrigob/ABAP_Sharepoint) project.
 
 * ZCL_CA_REST_HTTP_SERVICES -> se puede ver su funcionamiento en el proyecto de "SAP Machine Learning"(https://github.com/irodrigob/SAP_Machine_Learning). / its operation can be seen in the "SAP Machine Learning"(https://github.com/irodrigob/SAP_Machine_Learning) project.
 
